@@ -1,0 +1,28 @@
+name: ItemChest
+version: 1.0
+main: com.hawkfalcon.ItemChest.Main
+commands: 
+   ic:
+      description: Default IC command
+permissions: 
+    ic.recieve:
+        description: Allows receiving of items
+        default: true
+    ic.add:
+        description: Allows adding of items
+        default: OP
+    ic.create:
+        description: Allows use of /ic create
+        default: OP
+    ic.create:
+        description: Allows use of /ic create
+        default: OP
+    ic.infinite:
+        description: Allows use of /ic infinite
+        default: OP
+    ic.limit:
+        description: Allows use of /ic limit
+        default: OP
+    ic.reload:
+        description: Allows use of /ic reload
+        default: OP

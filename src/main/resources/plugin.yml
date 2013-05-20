@@ -1,6 +1,6 @@
 name: ItemChest
 version: 1.0
-main: com.hawkfalcon.ItemChest.Main
+main: com.hawkfalcon.ItemChest.ItemChest
 commands: 
    ic:
       description: Default IC command

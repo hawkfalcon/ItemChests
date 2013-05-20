@@ -1,13 +1,20 @@
 package com.hawkfalcon.ItemChests;
 
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.block.Chest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.InventoryType.SlotType;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+
+import com.hawkfalcon.ItemChests.API.PlayerItemChestOpenEvent;
 
 
 public class InventoryListener implements Listener {
@@ -15,6 +22,17 @@ public class InventoryListener implements Listener {
 
     public InventoryListener(ItemChests m) {
         this.p = m;
+    }
+    
+    @EventHandler
+    public void onOpen(PlayerInteractEvent event) {
+        if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.CHEST && ((Chest) event.getClickedBlock()).getInventory().getName().equals(ChatColor.RESET + "ItemChest")) {
+            PlayerItemChestOpenEvent e = new PlayerItemChestOpenEvent(event.getPlayer(), event.getClickedBlock().getLocation());
+            Bukkit.getPluginManager().callEvent(e);
+            if (e.isCancelled()) {
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler

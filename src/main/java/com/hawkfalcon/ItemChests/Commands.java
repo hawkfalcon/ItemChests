@@ -29,7 +29,7 @@ public class Commands implements CommandExecutor {
                     if (args[0].equalsIgnoreCase("create") && ((sender.hasPermission("ic.create")))) {
                         ItemStack c = new ItemStack(Material.CHEST, 1);
                         ItemMeta im = c.getItemMeta();
-                        im.setDisplayName("ItemChest");
+                        im.setDisplayName(ChatColor.RESET + "ItemChest");
                         ArrayList<String> lore = new ArrayList<String>();
                         lore.add("Distribute infinite items!");
                         im.setLore(lore);

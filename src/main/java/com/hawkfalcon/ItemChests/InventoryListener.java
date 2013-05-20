@@ -20,7 +20,7 @@ public class InventoryListener implements Listener {
     @EventHandler
     public void onPlayerInteract(InventoryClickEvent event) {
         String n = event.getWhoClicked().getName();
-        if (event.getInventory().getType() == InventoryType.CHEST && event.getInventory().getName().equals("ItemChest")) {
+        if (event.getInventory().getType() == InventoryType.CHEST && event.getInventory().getName().equals(ChatColor.RESET + "ItemChest")) {
             if (event.getSlotType() == SlotType.CONTAINER) {
                 if (event.getRawSlot() < 27) {
                     if (event.isLeftClick()) {

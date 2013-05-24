@@ -25,7 +25,7 @@ public class InventoryListener implements Listener {
     
     @EventHandler
     public void onOpen(PlayerInteractEvent event) {
-        if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.CHEST && ((Chest) event.getClickedBlock()).getInventory().getName().equals(ChatColor.RESET + "ItemChest")) {
+        if (event.getClickedBlock() != null && event.getClickedBlock().getType() == Material.CHEST && ((Chest) event.getClickedBlock().getState()).getInventory().getName().equals(ChatColor.RESET + "ItemChest")) {
             PlayerItemChestOpenEvent e = new PlayerItemChestOpenEvent(event.getPlayer(), event.getClickedBlock().getLocation());
             Bukkit.getPluginManager().callEvent(e);
             if (e.isCancelled()) {

@@ -36,6 +36,8 @@ public class Commands implements CommandExecutor {
                         c.setItemMeta(im);
                         p.getServer().getPlayer(n).getInventory().addItem(c);
                         message("ItemChest received!", n);
+                    } else {
+                        sender.sendMessage("You do not have permission to do this!");
                     }
                     if (args[0].equalsIgnoreCase("infinite") && ((sender.hasPermission("ic.infinite")))) {
                         if (p.infinite) {

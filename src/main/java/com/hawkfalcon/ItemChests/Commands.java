@@ -36,10 +36,7 @@ public class Commands implements CommandExecutor {
                         c.setItemMeta(im);
                         p.getServer().getPlayer(n).getInventory().addItem(c);
                         message("ItemChest received!", n);
-                    } else {
-                        sender.sendMessage("You do not have permission to do this!");
-                    }
-                    if (args[0].equalsIgnoreCase("infinite") && ((sender.hasPermission("ic.infinite")))) {
+                    } else if (args[0].equalsIgnoreCase("infinite") && ((sender.hasPermission("ic.infinite")))) {
                         if (p.infinite) {
                             p.infinite = false;
                             message("Infinite mode disabled", n);
@@ -51,12 +48,13 @@ public class Commands implements CommandExecutor {
                             p.getConfig().set("infinite", true);
                             p.saveConfig();
                         }
-                    }
-                    if (args[0].equalsIgnoreCase("reload") && ((sender.hasPermission("ic.reload")))) {
+                    } else if (args[0].equalsIgnoreCase("reload") && ((sender.hasPermission("ic.reload")))) {
                         p.reloadConfig();
                         p.infinite = p.getConfig().getBoolean("infinite");
                         p.limit = p.getConfig().getInt("limit");
                         message("Reloaded config", n);
+                    } else {
+                        sender.sendMessage("You do not have permission to do this!");
                     }
                 }
                 if (args.length == 2) {
@@ -67,6 +65,8 @@ public class Commands implements CommandExecutor {
                         message("Limit changed to " + p.limit + " items per day.", n);
                         p.getConfig().set("limit", p.limit);
                         p.saveConfig();
+                    } else {
+                        sender.sendMessage("You do not have permission to do this!");
                     }
                 }
             }

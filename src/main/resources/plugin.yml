@@ -1,5 +1,5 @@
 name: ItemChests
-version: 1.0
+version: 1.1.1
 main: com.hawkfalcon.ItemChests.ItemChests
 commands: 
    ic:

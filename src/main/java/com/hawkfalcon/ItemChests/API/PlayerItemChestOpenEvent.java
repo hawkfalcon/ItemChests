@@ -15,27 +15,27 @@ public class PlayerItemChestOpenEvent extends Event {
         this.p = p;
         this.chestLoc = chestLoc;
     }
-    
+
     public HandlerList getHandlers() {
         return handlers;
     }
-    
+
     public static HandlerList getHandlerList() {
         return handlers;
     }
-    
+
     public void setCancelled(Boolean cancelled) {
         this.cancel = cancelled;
     }
-    
+
     public boolean isCancelled() {
         return this.cancel;
     }
-    
+
     public Player getPlayer() {
         return this.p;
     }
-    
+
     public Location getChestLocation() {
         return this.chestLoc;
     }

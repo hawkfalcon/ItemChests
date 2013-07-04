@@ -21,7 +21,7 @@ public class Commands implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         if (sender instanceof Player) {
             String n = sender.getName();
-            if ((cmd.getName().equalsIgnoreCase("ic")) || (cmd.getName().equalsIgnoreCase("ic"))) {
+            if ((cmd.getName().equalsIgnoreCase("ic")) || (cmd.getName().equalsIgnoreCase("itemchest"))) {
                 if (args.length == 0) {
                     message("Create an ItemChest with /ic create", n);
                 }

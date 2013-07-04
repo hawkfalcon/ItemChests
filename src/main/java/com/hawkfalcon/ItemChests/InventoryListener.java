@@ -1,6 +1,9 @@
 package com.hawkfalcon.ItemChests;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -8,6 +11,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -18,6 +22,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.hawkfalcon.ItemChests.API.PlayerItemChestOpenEvent;
+import com.hawkfalcon.ItemChests.API.PlayerItemChestReceiveItemEvent;
 
 
 public class InventoryListener implements Listener {
@@ -26,6 +31,9 @@ public class InventoryListener implements Listener {
     public InventoryListener(ItemChests m) {
         this.p = m;
     }
+
+    InventoryAction[] iaa = {InventoryAction.PLACE_ALL, InventoryAction.PLACE_ONE, InventoryAction.PLACE_SOME, InventoryAction.PICKUP_ONE, InventoryAction.PICKUP_SOME, InventoryAction.PICKUP_ONE, InventoryAction.PICKUP_HALF, InventoryAction.PICKUP_ALL, InventoryAction.NOTHING };
+    public ArrayList<InventoryAction> ias = new ArrayList<InventoryAction>(Arrays.asList(iaa));
 
     @EventHandler
     public void onOpen(PlayerInteractEvent event) {
@@ -49,71 +57,54 @@ public class InventoryListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerInteract(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        String name = player.getName();
+    public void onBreak(BlockBreakEvent event) {
         /**
          * ItemChest
          */
+        if (event.getBlock() instanceof Chest) {
+            Chest chest = (Chest) event.getBlock();
+            if (chest.getInventory().getType() == InventoryType.CHEST && chest.getInventory().getName().equals(ChatColor.RESET + "ItemChest")) {
+                if (!event.getPlayer().hasPermission("ic.add")) {
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+        String name = player.getName();
         if (event.getInventory().getType() == InventoryType.CHEST && event.getInventory().getName().equals(ChatColor.RESET + "ItemChest")) {
-            if (event.getSlotType() == SlotType.CONTAINER) {
-                InventoryAction ia = event.getAction();
-                /**
-                 * Top of inventory
-                 */
-                if (event.getRawSlot() < 27) {
-                    /**
-                     * if recieve permission is negated, cancel any event and
-                     * break
-                     */
-                    if (!player.hasPermission("ic.recieve")) {
+            if (event.getSlotType() != SlotType.CONTAINER)
+                return;
+            InventoryAction ia = event.getAction();
+            if (event.getRawSlot() < 27 && event.getRawSlot() > -1) {
+                if (!player.hasPermission("ic.recieve")) {
+                    event.setCancelled(true);
+                    return;
+                }
+                if (ia == InventoryAction.PLACE_ALL || ia == InventoryAction.PLACE_ONE || ia == InventoryAction.PLACE_SOME) {
+                    if (player.hasPermission("ic.add")) {
+                        return;
+                    } else {
                         event.setCancelled(true);
                         return;
                     }
-                    ItemStack item = event.getCurrentItem();
-                    /**
-                     * Placing an item
-                     */
-                    if (ia == InventoryAction.PLACE_ALL || ia == InventoryAction.PLACE_ONE || ia == InventoryAction.PLACE_SOME) {
-                        /**
-                         * Cancel placing if no perms
-                         */
-                        if (!player.hasPermission("ic.add")) {
-                            event.setCancelled(true);
-                        } else {
-                            return;
-                        }
-                        /**
-                         * Picking up an item
-                         */
-                    } else if (ia == InventoryAction.PICKUP_ONE || ia == InventoryAction.PICKUP_SOME || ia == InventoryAction.PICKUP_ONE || ia == InventoryAction.PICKUP_HALF) {
-                        /**
-                         * if its left, and leftclick is false, cancel the
-                         * event
-                         */
-                        if (event.getClick() == ClickType.LEFT && !p.getConfig().getBoolean("leftclick")) {
-                            event.setCancelled(true);
-                            /**
-                             * Right click, or left click and true, give item
-                             */
-                        } else {
-                            event.setCancelled(true);
-                            giveItem(name, item);
-                        }
+                } else if (ia == InventoryAction.PICKUP_ONE || ia == InventoryAction.PICKUP_SOME || ia == InventoryAction.PICKUP_ALL || ia == InventoryAction.PICKUP_HALF) {
+                    if (event.getClick() == ClickType.LEFT && player.hasPermission("ic.add")) {
+                        return;
                     } else {
-                        /**
-                         * Cancel the rest
-                         */
                         event.setCancelled(true);
+                        giveItem(name, event.getCurrentItem());
                     }
                 } else {
-                    /**
-                     * Prevent stealing from top inventory
-                     */
-                    if (ia == InventoryAction.COLLECT_TO_CURSOR || ia == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-                        event.setCancelled(true);
-                    }
+                    event.setCancelled(true);
                 }
+            } else {
+                if (ias.contains(ia))
+                    return;
+                event.setCancelled(true);
             }
         }
     }
@@ -152,7 +143,9 @@ public class InventoryListener implements Listener {
      * @param item
      */
     public void recieveItem(String name, ItemStack item) {
+        PlayerItemChestReceiveItemEvent e = new PlayerItemChestReceiveItemEvent(p.getServer().getPlayerExact(name), item);
+        Bukkit.getPluginManager().callEvent(e);
         p.getServer().getPlayer(name).getInventory().addItem(item);
-        message("Received " + item.getAmount() + " " + item.getType() + "!", name);
+        message(ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("receivedmessage").replace("{amount}", item.getAmount() + "").replace("{item}", item.getType().toString())), name);
     }
 }

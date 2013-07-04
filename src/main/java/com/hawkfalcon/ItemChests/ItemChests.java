@@ -30,6 +30,7 @@ public class ItemChests extends JavaPlugin {
         }
         getServer().getPluginManager().registerEvents(InventoryListener, this);
         getCommand("ic").setExecutor(Commands);
+        getCommand("itemchest").setExecutor(Commands);
         infinite = getConfig().getBoolean("infinite");
         limit = getConfig().getInt("limit");
         startTimer();

@@ -4,6 +4,8 @@ main: com.hawkfalcon.ItemChests.ItemChests
 commands: 
    ic:
       description: Default IC command
+   itemchest:
+      description: Default IC command alias
 permissions: 
     ic.recieve:
         description: Allows receiving of items

@@ -1,9 +1,8 @@
 package com.hawkfalcon.ItemChests;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import com.hawkfalcon.ItemChests.API.PlayerItemChestOpenEvent;
+import com.hawkfalcon.ItemChests.API.PlayerItemChestReceiveItemEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -12,17 +11,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.hawkfalcon.ItemChests.API.PlayerItemChestOpenEvent;
-import com.hawkfalcon.ItemChests.API.PlayerItemChestReceiveItemEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class InventoryListener implements Listener {
@@ -32,7 +27,7 @@ public class InventoryListener implements Listener {
         this.p = m;
     }
 
-    InventoryAction[] iaa = {InventoryAction.PLACE_ALL, InventoryAction.PLACE_ONE, InventoryAction.PLACE_SOME, InventoryAction.PICKUP_ONE, InventoryAction.PICKUP_SOME, InventoryAction.PICKUP_ONE, InventoryAction.PICKUP_HALF, InventoryAction.PICKUP_ALL, InventoryAction.NOTHING };
+    InventoryAction[] iaa = {InventoryAction.PLACE_ALL, InventoryAction.PLACE_ONE, InventoryAction.PLACE_SOME, InventoryAction.PICKUP_ONE, InventoryAction.PICKUP_SOME, InventoryAction.PICKUP_ONE, InventoryAction.PICKUP_HALF, InventoryAction.PICKUP_ALL, InventoryAction.NOTHING};
     public ArrayList<InventoryAction> ias = new ArrayList<InventoryAction>(Arrays.asList(iaa));
 
     @EventHandler
@@ -74,7 +69,6 @@ public class InventoryListener implements Listener {
     @EventHandler
     public void onPlayerInteract(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        String name = player.getName();
         if (event.getInventory().getType() == InventoryType.CHEST && event.getInventory().getName().equals(ChatColor.RESET + "ItemChest")) {
             if (event.getSlotType() != SlotType.CONTAINER)
                 return;
@@ -96,7 +90,7 @@ public class InventoryListener implements Listener {
                         return;
                     } else {
                         event.setCancelled(true);
-                        giveItem(name, event.getCurrentItem());
+                        giveItem(player, event.getCurrentItem());
                     }
                 } else {
                     event.setCancelled(true);
@@ -111,22 +105,22 @@ public class InventoryListener implements Listener {
 
     /**
      * Check config, whether to give item
-     * 
-     * @param name
+     *
+     * @param player
      * @param item
      */
-    public void giveItem(String name, ItemStack item) {
-        if (p.infinite) {
-            recieveItem(name, item);
+    public void giveItem(Player player, ItemStack item) {
+        if (p.getChestType() == ChestType.INFINITE) {
+            recieveItem(player, item);
         } else {
-            if (!p.playerLimit.containsKey(name)) {
-                p.playerLimit.put(name, p.limit);
+            if (!p.playerHasLimitedUses(player)) {
+                p.addLimitedUses(player);
             } else {
-                if (p.playerLimit.get(name) > 0) {
-                    p.playerLimit.put(name, p.playerLimit.get(name) - 1);
-                    recieveItem(name, item);
+                if (p.canUse(player)) {
+                    p.decreasePlayerUses(player);
+                    recieveItem(player, item);
                 } else {
-                    message("You have reached the max items for today", name);
+                    message("You have reached the max items for today", player.getName());
                 }
             }
         }
@@ -138,14 +132,14 @@ public class InventoryListener implements Listener {
 
     /**
      * Actually give item
-     * 
-     * @param name
+     *
+     * @param player
      * @param item
      */
-    public void recieveItem(String name, ItemStack item) {
-        PlayerItemChestReceiveItemEvent e = new PlayerItemChestReceiveItemEvent(p.getServer().getPlayerExact(name), item);
+    public void recieveItem(Player player, ItemStack item) {
+        PlayerItemChestReceiveItemEvent e = new PlayerItemChestReceiveItemEvent(player, item);
         Bukkit.getPluginManager().callEvent(e);
-        p.getServer().getPlayer(name).getInventory().addItem(item);
-        message(ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("receivedmessage").replace("{amount}", item.getAmount() + "").replace("{item}", item.getType().toString())), name);
+        player.getInventory().addItem(item);
+        message(ChatColor.translateAlternateColorCodes('&', p.getConfig().getString("receivedmessage").replace("{amount}", item.getAmount() + "").replace("{item}", item.getType().toString())), player.getName());
     }
 }

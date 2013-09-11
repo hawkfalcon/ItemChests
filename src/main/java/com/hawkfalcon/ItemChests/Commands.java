@@ -1,7 +1,5 @@
 package com.hawkfalcon.ItemChests;
 
-import java.util.ArrayList;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -10,6 +8,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
 
 public class Commands implements CommandExecutor {
     public ItemChests p;
@@ -35,38 +35,21 @@ public class Commands implements CommandExecutor {
                         im.setLore(lore);
                         c.setItemMeta(im);
                         p.getServer().getPlayer(n).getInventory().addItem(c);
-                        message("ItemChest received!", n);
-                    } else if (args[0].equalsIgnoreCase("infinite") && ((sender.hasPermission("ic.infinite")))) {
-                        if (p.infinite) {
-                            p.infinite = false;
-                            message("Infinite mode disabled", n);
-                            p.getConfig().set("infinite", false);
-                            p.saveConfig();
-                        } else {
-                            p.infinite = true;
-                            message("Infinite mode enabled", n);
-                            p.getConfig().set("infinite", true);
-                            p.saveConfig();
-                        }
-                    } else if (args[0].equalsIgnoreCase("reload") && ((sender.hasPermission("ic.reload")))) {
-                        p.reloadConfig();
-                        p.infinite = p.getConfig().getBoolean("infinite");
-                        p.limit = p.getConfig().getInt("limit");
-                        message("Reloaded config", n);
-                    } else {
-                        sender.sendMessage("You do not have permission to do this!");
+                        message("You have received an ItemChest!", n);
                     }
-                }
-                if (args.length == 2) {
-                    String q = args[1];
-                    if (args[0].equalsIgnoreCase("limit") && ((sender.hasPermission("ic.limit")))) {
-                        p.limit = Integer.parseInt(q);
-                        p.playerLimit.clear();
-                        message("Limit changed to " + p.limit + " items per day.", n);
-                        p.getConfig().set("limit", p.limit);
-                        p.saveConfig();
-                    } else {
-                        sender.sendMessage("You do not have permission to do this!");
+                    if (args.length == 2) {
+                        String q = args[1];
+                        if (args[0].equalsIgnoreCase("limit") && ((sender.hasPermission("ic.limit")))) {
+                            p.setLimit(Integer.parseInt(q));
+                            message("Limit changed to " + p.getLimit() + " items per day.", n);
+                            p.getConfig().set("limit", p.getLimit());
+                            p.saveConfig();
+
+                        } else if (args[0].equalsIgnoreCase("mode") && ((sender.hasPermission("ic.mode")))) {
+                            p.setChestType(ChestType.valueOf(args[1]));
+                        } else {
+                            sender.sendMessage("You do not have permission to do this!");
+                        }
                     }
                 }
             }

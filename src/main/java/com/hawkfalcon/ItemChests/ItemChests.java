@@ -34,7 +34,7 @@ public class ItemChests extends JavaPlugin {
         getServer().getPluginManager().registerEvents(InventoryListener, this);
         getCommand("ic").setExecutor(Commands);
         getCommand("itemchest").setExecutor(Commands);
-        chestType = ChestType.valueOf(getConfig().getString("chestType"));
+        chestType = ChestType.valueOf(getConfig().getString("chestType", "INFINITE"));
         limit = getConfig().getInt("limit");
         if (chestType == ChestType.TIMELIMIT) {
         startTimer();
